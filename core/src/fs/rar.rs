@@ -1,4 +1,5 @@
 use rocket::http::ContentType;
+use std::fs::File;
 use unrar::archive::Entry;
 use walkdir::DirEntry;
 
@@ -27,7 +28,7 @@ impl IsImage for Entry {
 	}
 }
 
-pub fn convert_to_cbr() {
+pub fn convert_to_cbz() {
 	unimplemented!()
 }
 
@@ -92,7 +93,7 @@ pub fn process_rar(file: &DirEntry) -> ProcessResult {
 pub fn rar_sample(file: &str) -> Result<u64, ProcessFileError> {
 	log::debug!("Calculating checksum sample size for: {}", file);
 
-	let file = std::fs::File::open(file)?;
+	let file = File::open(file)?;
 
 	let file_size = file.metadata()?.len();
 	let threshold = DIGEST_SAMPLE_SIZE * DIGEST_SAMPLE_COUNT;
@@ -184,6 +185,23 @@ pub fn get_rar_image(file: &str, page: i32) -> GetPageResult {
 	entries.sort_by(|a, b| a.filename.cmp(&b.filename));
 
 	let entry = entries.into_iter().nth((page - 1) as usize).unwrap();
+
+	#[cfg(feature = "libarchive")]
+	{
+		use compress_tools::uncompress_archive_file;
+
+		let filename = entry.filename.to_string_lossy().to_string();
+
+		println!("ATTEMPTING TO GET BYTES OF {:?}", filename);
+
+		let source = File::open(file)?;
+		let mut buf = Vec::new();
+		// let decode_utf8 = |bytes: &[u8]| Ok(std::str::from_utf8(bytes)?.to_owned());
+
+		uncompress_archive_file(source, &mut buf, &filename)?;
+
+		return Ok((ContentType::JPEG, buf));
+	}
 
 	let archive = unrar::Archive::new(file)?;
 

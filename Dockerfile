@@ -74,6 +74,10 @@ ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 COPY .cargo .cargo
 COPY core/ .
 
+RUN apt-get update && \
+    apt-get install -y \
+        libarchive-dev
+
 RUN rustup target add x86_64-unknown-linux-musl
 
 RUN cargo build --release --target x86_64-unknown-linux-musl && \

@@ -43,6 +43,8 @@ pub enum ProcessFileError {
 	RarReadError,
 	#[error("Error reading bytes from rar")]
 	RarByteReadError(#[from] std::str::Utf8Error),
+	#[error("Error during archive manipulation: {0}")]
+	CompressToolsError(#[from] compress_tools::Error),
 	#[error("Unsupported file type: {0}")]
 	UnsupportedFileType(String),
 	#[error("An unknown error occurred: {0}")]
