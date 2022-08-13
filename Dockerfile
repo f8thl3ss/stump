@@ -74,9 +74,24 @@ ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 COPY .cargo .cargo
 COPY core/ .
 
+# https://github.com/OSSystems/compress-tools-rs/pull/76
+# FIXME: static compilation is not functional. i.e. the build fails
 RUN apt-get update && \
     apt-get install -y \
-        libarchive-dev
+        pkg-config \
+        libarchive-dev \
+        libicu-dev \
+        nettle-dev \
+        libacl1-dev \
+        liblzma-dev \
+        libzstd-dev \
+        liblz4-dev \
+        libbz2-dev \
+        zlib1g-dev \
+        libxml2-dev
+
+ENV PKG_CONFIG_ALLOW_CROSS=1
+ENV PKG_CONFIG_PATH=/usr/lib/x86_64-musl/pkgconfig/
 
 RUN rustup target add x86_64-unknown-linux-musl
 
