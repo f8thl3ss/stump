@@ -12,5 +12,7 @@ target
 
 # ignore contents in excess directories, some are kept only so cargo 
 # doesn't yell at me
-apps/docs
-apps/mobile
+apps
+!apps/server
+!apps/web
+core/integration-tests

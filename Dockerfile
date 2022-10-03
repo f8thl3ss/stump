@@ -71,10 +71,28 @@ WORKDIR /app
 
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
-COPY .cargo .cargo
-COPY . .
-
 RUN rustup update && rustup target add x86_64-unknown-linux-musl
+
+COPY .cargo .cargo
+
+# Hack to make docker cache the build dependencies
+COPY Cargo.toml .
+# COPY Cargo.lock .
+COPY core core
+COPY apps/server/Cargo.toml apps/server/
+RUN set -ex ;\
+        mkdir apps/server/src ;\
+        echo 'fn main() { println!("Wow, such empty!"); }' > apps/server/src/main.rs ;\
+        # Run sed command to remove the lines "core/integration-tests", "apps/desktop/src-tauri and "apps/tui" from Cargo.toml
+        # FIXME: this nice one liner doesn't work with the new lines in the Cargo.toml... I want to eventually fix this
+        # sed -i 's/members = \[.*\]/members = \[ "core", "core\/prisma", "apps\/server" \]/' Cargo.toml ;\
+        sed -i '/core\/integration-tests/d' Cargo.toml; \
+        sed -i '/apps\/desktop\/src-tauri/d' Cargo.toml; \
+        sed -i '/apps\/tui/d' Cargo.toml; \
+        cargo build --release --target x86_64-unknown-linux-musl ;\
+        rm -rf apps/server/src
+
+COPY . .
 
 RUN cargo build --package stump_server --bin stump_server --release --target x86_64-unknown-linux-musl && \
     cp target/x86_64-unknown-linux-musl/release/stump_server ./stump

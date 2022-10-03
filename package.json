@@ -10,7 +10,7 @@
 		"checks": "pnpm -r check",
 		"tests": "pnpm -r test",
 		"start:web": "pnpm run server start",
-		"dev:server": "cargo watch --ignore common -x 'run --manifest-path=apps/server/Cargo.toml --package stump_server'",
+		"dev:server": "cargo watch --ignore common -x \"run --manifest-path=apps/server/Cargo.toml --package stump_server\"",
 		"dev:web": "concurrently -n server,web -c green.bold,blue.bold \"pnpm dev:server\" \"pnpm web dev\"",
 		"dev:desktop": "concurrently -n server,desktop -c green.bold,blue.bold \"pnpm run server dev\" \"pnpm desktop dev\"",
 		"core": "pnpm --filter @stump/core --",
@@ -27,7 +27,8 @@
 		"build:desktop": "pnpm desktop build",
 		"build:docker": "docker buildx build --push --platform=linux/arm64/v8,linux/amd64 -t aaronleopold/stump-preview:latest .",
 		"cache:docker-arm": "docker buildx build --platform=linux/arm64/v8 -t aaronleopold/stump-preview:latest .",
-		"build:docker-amd": "docker buildx build --push --platform=linux/amd64 -t aaronleopold/stump-preview:latest ."
+		"build:docker-amd": "docker buildx build --push --platform=linux/amd64 -t aaronleopold/stump-preview:latest .",
+		"build:docker-amd:load": "docker buildx build --load --platform=linux/amd64 -t aaronleopold/stump-preview:latest ."
 	},
 	"devDependencies": {
 		"concurrently": "^6.5.1",
