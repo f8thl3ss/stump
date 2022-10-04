@@ -55,10 +55,15 @@ async fn main() -> ServerResult<()> {
 		.layer(session::get_session_layer())
 		.layer(cors::get_cors_layer());
 
-	let addr = SocketAddr::from(([0, 0, 0, 0], stump_environment.port.unwrap_or(10801)));
+	let port = stump_environment.port.unwrap_or(10801);
+	let addr = SocketAddr::from(([0, 0, 0, 0], port));
+
+	info!("⚡ Starting server on http://{}", addr);
 
 	axum::Server::bind(&addr)
 		.serve(app.into_make_service())
+		// TODO: do this
+		// .with_graceful_shutdown(signal)
 		.await
 		.expect("Failed to start HTTP server!");
 

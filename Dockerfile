@@ -89,10 +89,16 @@ RUN set -ex ;\
         sed -i '/core\/integration-tests/d' Cargo.toml; \
         sed -i '/apps\/desktop\/src-tauri/d' Cargo.toml; \
         sed -i '/apps\/tui/d' Cargo.toml; \
-        cargo build --release --target x86_64-unknown-linux-musl ;\
+        # sed -i 's/stump_core = { path = "..\/..\/core" }/#stump_core = { path = "..\/..\/core" }/' apps/server/Cargo.toml; \
+        cargo build --package stump_server --bin stump_server --release --target x86_64-unknown-linux-musl; \
+        # sed -i 's/#stump_core = { path = "..\/..\/core" }/stump_core = { path = "..\/..\/core" }/' apps/server/Cargo.toml
         rm -rf apps/server/src
 
 COPY . .
+
+RUN sed -i '/core\/integration-tests/d' Cargo.toml; \
+        sed -i '/apps\/desktop\/src-tauri/d' Cargo.toml; \
+        sed -i '/apps\/tui/d' Cargo.toml
 
 RUN cargo build --package stump_server --bin stump_server --release --target x86_64-unknown-linux-musl && \
     cp target/x86_64-unknown-linux-musl/release/stump_server ./stump
